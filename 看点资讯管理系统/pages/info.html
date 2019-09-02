@@ -1,0 +1,372 @@
+<div>
+	<div id="info-manage">
+		<!-- 按钮组 -->
+		<div class="btns-div">
+			<select class="form-control" id="find">
+			</select>
+			<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal" data-whatever="新增">新增</button>
+			<button type="button" class="btn btn-danger" id="deleteAll">批量删除</button>
+		</div>
+
+		<!-- 模态框 -->
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="exampleModalLabel"></h4>
+		      </div>
+		      <div class="modal-body">
+		        <form>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">标题:</label>
+		            <input type="text" class="form-control" id="recipient-name1">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">所属栏目:</label>
+		            <select class="form-control" id="recipient-name2">
+					</select>
+		          </div>
+		           <div class="form-group">
+		            <label class="control-label">列表样式:</label>
+		            <input type="radio" class="form-control" id="style-one" name="list-style">
+		            <img src="./images/style-one.jpg">
+		            <input type="radio" class="form-control" id="style-two" name="list-style">
+		            <img src="./images/style-two.jpg">
+		          </div>
+		          <div class="form-group">
+		            <label for="message-text" class="control-label">正文:</label>
+		            <textarea class="form-control" id="message-text"></textarea>
+		          </div>
+		        </form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		        <button type="button" class="btn btn-success" id="add">保存数据</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- 表格组 -->
+		<div class="fenye">
+			<div class="table-div">
+				<table class="table table-bordered text-center">
+					<thead>
+						<tr>
+							<th class="text-center">编号</th>
+							<th class="text-center">文章标题</th>
+							<th class="text-center">所属栏目</th>
+							<th class="text-center">排列方式</th>
+							<th class="text-center">作者</th>
+							<th class="text-center">发布时间</th>
+							<th class="text-center">阅读次数</th>
+							<th class="text-center">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+			<nav aria-label="Page navigation">
+			  <ul class="pagination">
+			    <li>
+			      <a href="#" aria-label="Previous">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+			    <li id="yewei">
+			      <a href="#" aria-label="Next">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			  </ul>
+			</nav>
+		</div>
+	</div>
+	<script type="text/javascript">
+		getAllCategory();
+		//得到数据方法
+		var arrAll = [];
+		function getAllCategory(){
+			getAjax('/manager/category/findAllCategory','get',null,function(res){
+				arrAll = res.data;
+				console.log(arrAll);
+				selectData(res.data);
+			},function(error){
+				console.log(error);
+			});
+		}
+
+		//select框获取数据的方法
+		function selectData(arr){
+			$('#find').html('');
+			arr.forEach(function(item){
+				var $newOption = $(`<option class='option'>`+item.name+`</option>`);
+				$('#find').append($newOption);
+			});
+			var selectName = $('#find').val();
+			var obj = arr.filter(function(item){
+				return item.name == selectName;
+			});
+			findFun(obj[0].id);
+			$('#find').click(function(event){
+				$event = $(event.target);
+				var attr = $event.attr('class');
+				if(attr == 'option'){
+					var selectName = $('#find').val();
+					$('.table-div tbody').html('');
+					console.log()
+					obj = arr.filter(function(item){
+						return item.name ==selectName;
+					});
+					findFun(obj[0].id);
+				}
+			});
+		}
+
+		//模态框
+		$('#exampleModal').on('show.bs.modal', function (event) {
+		  	var button = $(event.relatedTarget);
+		  	var recipient = button.data('whatever');
+		  	var modal = $(this);
+		 	modal.find('.modal-title').text('发布资讯');
+		 	$('#recipient-name2').html('');
+			arrAll.forEach(function(item){
+				var $newOption = $(`<option class='option'>`+item.name+`</option>`);
+				$('#recipient-name2').append($newOption);
+			});
+			var selectName = $('#recipient-name2').val();
+			var obj = arrAll.filter(function(item){
+				return item.name == selectName;
+			});
+			$('#recipient-name2').attr('data-id',obj[0].id);
+			$('#recipient-name2').click(function(event){
+				$event = $(event.target);
+				var attr = $event.attr('class');
+				if(attr == 'option'){
+					var selectName = $('#recipient-name2').val();
+					$('.table-div tbody').html('');
+					var obj = arrAll.filter(function(item){
+						return item.name ==selectName;
+					});
+					$('#recipient-name2').attr('data-id',obj[0].id);
+				}
+			});
+		  	//信息填入
+		  	//console.log(button);
+		  	if(recipient=='修改'){
+		  		var $xinXi = button.parent();
+		  		$xinXi = $xinXi.siblings(':eq(1)');
+		  		$('#recipient-name1').val($xinXi.text());
+		  		$xinXi = $xinXi.siblings(':eq(2)');
+		  		console.log('+++++',findAll);
+		  		var dataId = button.attr('value');
+		  		$('#add').attr('data-id',dataId);
+		  		var findArr = findAll.filter(function(item){
+		  			return item.id == dataId;
+		  		});
+		  		$('#message-text').val(findArr[0].content);
+		  		console.log($('input[name=list-style][id='+findArr[0].liststyle+']'));
+		  		$('input[name=list-style][id='+findArr[0].liststyle+']').prop('checked',true);;
+		  	}else{
+		  		$('#recipient-name1').val('');
+		  		$('#message-text').val('');
+		  	}
+		});
+
+		//时间函数
+		function time(){
+			function getNow(s) {
+				return s < 10 ? '0' + s: s;
+			}
+			var myDate = new Date();             
+			var year=myDate.getFullYear();
+			var month=myDate.getMonth()+1;
+			var date=myDate.getDate();
+			var h=myDate.getHours();
+			var m=myDate.getMinutes();
+			var s=myDate.getSeconds(); 
+			var times = year+'-'+getNow(month)+'-'+getNow(date)+' '+getNow(h)+':'+getNow(m)+':'+getNow(s);
+			return times;
+		}
+
+		//添加或修改数据的方法
+		$('#add').click(function(){
+			var obj = {
+				title:'',
+				liststyle:'',
+				categoryId:'',
+				content:'',
+			};
+			if($('#recipient-name1').val()){
+				console.log(1);
+				obj.id = $('#add').attr('data-id');
+				// obj.publishtime = time();
+				obj.readtimes = 0;
+			}
+			obj.title = $('#recipient-name1').val()+'';
+			obj.liststyle = $('input[name=list-style]:checked').attr('id');
+			obj.categoryId = +($('#recipient-name2').attr('data-id'));
+			obj.content = $('#message-text').val();
+			console.log(obj);
+			getAjax('/manager/article/saveOrUpdateArticle','POST',obj,function(res){
+				getAllCategory();
+				alert('保存成功');
+			},function(error){
+				alert('保存失败');
+			});
+		});
+
+		//单个删除
+		$('tbody').click(function(event){
+				//console.log(event.target);
+			if ($(event.target).attr('class')=='fa fa-trash-o') {
+				var id = +($(event.target).attr('value'));
+				console.log(id);
+				var obj = {};
+				obj.id = id;
+				getAjax('/manager/article/deleteArticleById','get',obj,function(res){
+					getAllCategory();
+					alert('删除成功');
+				},function(error){
+					getAllCategory();
+					console.log('删除失败');
+				});
+			}
+		});
+
+
+
+		//批量删除
+		$('#deleteAll').click(function(){
+			var ids = [];
+			$('td input:checked').each(function(index,item){
+				$item = $(item);
+				ids[index] = Number($item.attr('value'));
+			});
+			var obj = {
+				ids:ids.join(),
+			};
+			console.log(obj);
+			getAjax('/manager/article/batchDeleteArticle','POST',obj,function(res){
+				getAllCategory();
+				$('td input:checked').prop('checked',false);
+				alert('批量删除成功');
+			},function(error){
+				getAllCategory();
+				alert('批量删除失败');
+			});
+		});
+
+		var findAll;
+		//得到文章的方法
+		function findFun(cId){
+			//console.log(cId);
+			var obj = {
+				page:0,
+				pageSize:100,
+				categoryId:cId,
+			}
+			getAjax('/manager/article/findArticle','get',obj,function(res){
+				var no = 0;
+				$('.table-div tbody').html('');
+				console.log(res.data);
+				findAll = res.data.list;
+				res.data.list.forEach(function(item){
+					if (item.author==null) {
+						var name='-';
+					}else{
+						var name = item.author
+					}
+					no += 1;
+					var $newTr = $(`<tr no="`+no+`">
+						<td><input type="checkbox" name="" value="`+item.id+`"></td>
+						<td>`+item.title+`</td>
+						<td>`+item.category.name+`</td>
+						<td>`+item.liststyle+`</td>
+						<td>`+name+`</td>
+						<td>`+item.publishtime+`</td>
+						<td>`+item.readtimes+`</td>
+						<td>
+							<i title="编辑" class="fa fa-pencil-square-o" aria-hidden="true" value="`+item.id+`" data-toggle="modal" data-target="#exampleModal" data-whatever="修改"></i>
+							<i title="删除" class="fa fa-trash-o" aria-hidden="true" value="`+item.id+`"></i>
+						</td>
+					</tr>`);
+					$('tbody').append($newTr);
+				});
+				fenYe();
+			},function(error){
+				alert('获取失败');
+			});
+		}
+
+		//设置分页
+		function fenYe(){
+			$('.yema').remove();
+			var $nextTr = $('tr[no=10]').nextAll();
+			$nextTr.css({
+				display:'none',
+			});
+			var no = $('tbody tr:last-child').attr('no');
+			var yeNo = parseInt(no/10);
+			for(var i=1;i<=(yeNo+1);i++){
+				var $newLi = $(`<li class="yema"><a href="#">`+i+`</a></li>`);
+				$('#yewei').before($newLi);
+			}
+			$($('.yema:eq(0)').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var yemaLeft = ($('.fenye').width()-$('.pagination').width())/2;
+			console.log(yemaLeft);
+			$('.pagination').css('left',yemaLeft+'px');
+		}
+		
+		var yemaNum = 1;
+		$('.pagination').click(function(event){
+			$($('.yema').children()).css({
+				background:'',
+				color:'',
+			});
+			var $yema = $(event.target);
+			var weiNum = $('#yewei').prev().text();
+			console.log($yema.attr('aria-label'));
+			if(($yema.attr('aria-label')=='Previous'||$yema.attr('aria-hidden'))&&yemaNum!=1){
+				var yemaText = yemaNum-1;
+				yemaNum = yemaText;
+				console.log(yemaText);
+			}
+			if(($yema.attr('aria-label')=='Next'||$yema.attr('aria-hidden'))&&yemaNum!=weiNum){
+				var yemaText = +(yemaNum)+1;
+				yemaNum = yemaText; 
+				console.log(yemaText);
+			}
+			if ($yema.attr('aria-label')==undefined&&!($yema.attr('aria-hidden'))){
+				console.log(333);
+				var yemaText = $yema.text();
+				yemaNum = yemaText; 
+			}
+			$($('.yema:eq('+(yemaNum-1)+')').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var nextNo = yemaText*10;
+			if(yemaText){
+				$('tr[no]').css({
+					display:'',
+				});
+				$nextTr = $('tr[no='+nextNo+']').nextAll();
+				$nextTr.css({
+					display:'none',
+				});
+				var prevNo = nextNo-9;
+				var $prevTr = $('tr[no='+prevNo+']').prevAll();
+				$prevTr.css({
+					display:'none',
+				});
+			}
+		});
+	</script>
+</div>

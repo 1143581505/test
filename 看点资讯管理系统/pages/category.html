@@ -1,0 +1,324 @@
+<div>
+	<div id="category-manage">
+		<!-- 栏目管理 -->
+		<!-- 按钮组 -->
+		<div class="btns-div">
+			<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal" data-whatever="新增">新增</button>
+			<button type="button" class="btn btn-danger" id="deleteAll">批量删除</button>
+		</div>
+
+		<!-- 模态框 -->
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="exampleModalLabel"></h4>
+		      </div>
+		      <div class="modal-body">
+		        <form>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">名称:</label>
+		            <input type="text" class="form-control" id="recipient-name1">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">父栏目:</label>
+		            <select class="form-control" id="recipient-name2">
+					</select>
+		          </div>
+		          <div class="form-group">
+		            <label for="message-text" class="control-label">描述:</label>
+		            <textarea class="form-control" id="message-text"></textarea>
+		          </div>
+		        </form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		        <button type="button" class="btn btn-success" id="add">保存数据</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!-- 表格组 -->
+		<div class="fenye">
+			<div class="table-div">
+				<table class="table table-bordered text-center">
+					<thead>
+						<tr>
+							<th class="text-center">编号</th>
+							<th class="text-center">名称</th>
+							<th class="text-center">父栏目</th>
+							<th class="text-center">描述</th>
+							<th class="text-center">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+			<nav aria-label="Page navigation">
+			  <ul class="pagination">
+			    <li>
+			      <a href="#" aria-label="Previous">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+			    <li id="yewei">
+			      <a href="#" aria-label="Next">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			  </ul>
+			</nav>
+		</div>
+	</div>
+	<script type="text/javascript">
+		getAllCategory();
+		//fenYe();
+
+		//得到数据方法
+		var arrAll = [];
+		/*function getAllCategory(){
+			getAjax('/manager/category/findAllCategory','get',null,function(res){
+				arrAll = res.data;
+				console.log(arrAll);
+				selectData(res.data);
+			},function(error){
+				console.log(error);
+			});
+		}*/
+
+		//模态框
+		$('#exampleModal').on('show.bs.modal', function (event) {
+		  	var button = $(event.relatedTarget);
+		  	var recipient = button.data('whatever');
+		  	var modal = $(this);
+		 	modal.find('.modal-title').text(recipient);
+		  	//modal.find('.modal-body input').val(recipient);
+		  	$('#recipient-name2').html('');
+		  	console.log('+++',arrAll);
+			arrAll.forEach(function(item){
+				var $newOption = $(`<option class='option'>`+item.name+`</option>`);
+				$('#recipient-name2').append($newOption);
+			});
+			// console.log('---',$('#recipient-name2'));
+			var selectName = $('#recipient-name2').val();
+			var obj = arrAll.filter(function(item){
+				return item.name == selectName;
+			});
+			console.log(obj);
+			$('#recipient-name2').attr('data-id',obj[0].id);
+			$('#recipient-name2').click(function(event){
+				$event = $(event.target);
+				var attr = $event.attr('class');
+				if(attr == 'option'){
+					var selectName = $('#recipient-name2').val();
+					$('.table-div tbody').html('');
+					var obj = arrAll.filter(function(item){
+						return item.name ==selectName;
+					});
+					$('#recipient-name2').attr('data-id',obj[0].id);
+				}
+			});
+		  	//信息填入
+		  	//console.log(button);
+		  	if(recipient=='修改'){
+		  		var $xinXi = button.parent();
+		  		$xinXi = $xinXi.siblings(':eq(1)');
+		  		$('#recipient-name1').val($xinXi.text());
+		  		$xinXi = $xinXi.siblings(':eq(2)');
+		  		$('#recipient-name2').val($xinXi.siblings(':eq(2)').text());
+		  		//console.log($xinXi);
+		  		$('#message-text').val($xinXi.text());
+
+		  		var dataId = button.attr('value');
+		  		$('#add').attr('data-id',dataId);
+		  		console.log($('#add').attr('data-id'));
+		  	}else{
+		  		$('#recipient-name1').val('');
+		  		$('#recipient-name2').val('');
+		  		$('#message-text').val('');
+		  	}
+		});
+
+		//给一个id即可获取该id的信息
+		function getById(id,handle){
+			getAjax('/manager/category/findAllCategory','get',null,function success(res){
+				res.data.forEach(function(item){
+					if (id==item.id) {
+						handle(item);
+					}
+				});
+				//console.log(obj);
+			},function(error){
+				console.log(error);
+			});
+		}
+
+		//添加或修改数据
+		$('#add').click(function(){
+			var obj = {
+				name:'',
+				comment:'',
+			};
+			if(($('#exampleModalLabel').text())=='修改'){
+				obj.id = $('#add').attr('data-id');
+			}
+			obj.name = $('#recipient-name1').val();
+			obj.parentId = +($('#recipient-name2').attr('data-id'));
+			obj.comment = $('#message-text').val();
+			getAjax('/manager/category/saveOrUpdateCategory','post',obj,function(res){
+				getAllCategory();
+				alert('保存成功');
+			},function(error){
+				alert('保存失败');
+			});
+		});
+
+		//单个删除
+		$('tbody').click(function(event){
+				//console.log(event.target);
+			if ($(event.target).attr('class')=='fa fa-trash-o') {
+				var id = +($(event.target).attr('value'));
+				console.log(id);
+				var obj = {};
+				obj.id = id;
+				getAjax('/manager/category/deleteCategoryById','get',obj,function(res){
+					getAllCategory();
+					alert('删除成功');
+				},function(error){
+					getAllCategory();
+					console.log('删除失败');
+				});
+			}
+		});
+
+
+
+		//批量删除
+		$('#deleteAll').click(function(){
+			var ids = [];
+			$('td input:checked').each(function(index,item){
+				$item = $(item);
+				ids[index] = Number($item.attr('value'));
+			});
+			var obj = {
+				ids:ids.join(),
+			};
+			console.log(obj);
+			getAjax('/manager/category/batchDeleteCategory','POST',obj,function(res){
+				getAllCategory();
+				$('td input:checked').prop('checked',false);
+				alert('批量删除成功');
+			},function(error){
+				getAllCategory();
+				alert('批量删除失败');
+			});
+		});
+
+
+
+		//得到数据方法
+		function getAllCategory(){
+			getAjax('/manager/category/findAllCategory','get',null,function(res){
+				//console.log(res.data);
+				arrAll = res.data;
+				var no = 0;
+				$('.table-div tbody').html('');
+				res.data.forEach(function(item){
+					if (item.parent==null) {
+						var name='-';
+					}else{
+						var name = item.parent.name;
+					}
+					if(item.name=='hf112'){
+						console.log(item);
+					}
+					no += 1;
+					var $newTr = $(`<tr no="`+no+`">
+						<td><input type="checkbox" name="" value="`+item.id+`"></td>
+						<td>`+item.name+`</td>
+						<td>`+name+`</td>
+						<td>`+item.comment+`</td>
+						<td>
+							<i title="编辑" class="fa fa-pencil-square-o" aria-hidden="true" value="`+item.id+`" data-toggle="modal" data-target="#exampleModal" data-whatever="修改"></i>
+							<i title="删除" class="fa fa-trash-o" aria-hidden="true" value="`+item.id+`"></i>
+						</td>
+					</tr>`);
+					$('tbody').append($newTr);
+				});
+				fenYe();
+			},function(error){
+				console.log(error);
+			});
+		}
+
+		//设置分页
+		function fenYe(){
+			$('.yema').remove();
+			var $nextTr = $('tr[no=10]').nextAll();
+			$nextTr.css({
+				display:'none',
+			});
+			var no = $('tbody tr:last-child').attr('no');
+			var yeNo = parseInt(no/10);
+			for(var i=1;i<=(yeNo+1);i++){
+				var $newLi = $(`<li class="yema"><a href="#">`+i+`</a></li>`);
+				$('#yewei').before($newLi);
+			}
+			$($('.yema:eq(0)').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var yemaLeft = ($('.fenye').width()-$('.pagination').width())/2;
+			console.log(yemaLeft);
+			$('.pagination').css('left',yemaLeft+'px');
+		}
+		
+		var yemaNum = 1;
+		$('.pagination').click(function(event){
+			$($('.yema').children()).css({
+				background:'',
+				color:'',
+			});
+			var $yema = $(event.target);
+			var weiNum = $('#yewei').prev().text();
+			console.log($yema.attr('aria-label'));
+			if(($yema.attr('aria-label')=='Previous'||$yema.attr('aria-hidden'))&&yemaNum!=1){
+				var yemaText = yemaNum-1;
+				yemaNum = yemaText;
+				console.log(yemaText);
+			}
+			if(($yema.attr('aria-label')=='Next'||$yema.attr('aria-hidden'))&&yemaNum!=weiNum){
+				var yemaText = +(yemaNum)+1;
+				yemaNum = yemaText; 
+				console.log(yemaText);
+			}
+			if ($yema.attr('aria-label')==undefined&&!($yema.attr('aria-hidden'))){
+				console.log(333);
+				var yemaText = $yema.text();
+				yemaNum = yemaText; 
+			}
+			$($('.yema:eq('+(yemaNum-1)+')').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var nextNo = yemaText*10;
+			if(yemaText){
+				$('tr[no]').css({
+					display:'',
+				});
+				$nextTr = $('tr[no='+nextNo+']').nextAll();
+				$nextTr.css({
+					display:'none',
+				});
+				var prevNo = nextNo-9;
+				var $prevTr = $('tr[no='+prevNo+']').prevAll();
+				$prevTr.css({
+					display:'none',
+				});
+			}
+		});
+	</script>
+</div>

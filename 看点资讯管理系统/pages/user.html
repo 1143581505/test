@@ -1,0 +1,283 @@
+<div>
+	<div id="user-manage">
+		<!-- 按钮组 -->
+		<div class="btns-div" id="userbtns-div">
+			<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal" data-whatever="新增">新增</button>
+		</div>
+
+		<!-- 模态框 -->
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="exampleModalLabel"></h4>
+		      </div>
+		      <div class="modal-body">
+		        <form>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">用户名:</label>
+		            <input type="text" class="form-control" id="recipient-name1">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">密码:</label>
+		            <input type="password" class="form-control" id="recipient-name2">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">确认密码:</label>
+		            <input type="password" class="form-control" id="recipient-name3">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">真实姓名:</label>
+		            <input type="text" class="form-control" id="recipient-name4">
+		          </div>
+		          <div class="form-group">
+		            <label for="recipient-name" class="control-label">邮箱:</label>
+		            <input type="text" class="form-control" id="recipient-name5">
+		          </div>
+		        </form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+		        <button type="button" class="btn btn-success" id="add">保存数据</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!-- div组 -->
+		<div class="fenye userfenye">
+			<div class="usergroup">
+				
+			</div>
+			<nav aria-label="Page navigation">
+			  <ul class="pagination">
+			    <li>
+			      <a href="#" aria-label="Previous">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+			    <li id="yewei">
+			      <a href="#" aria-label="Next">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			  </ul>
+			</nav>
+		</div>
+	</div>
+	<script type="text/javascript">
+		getAllCategory();
+
+		//开关
+		function switchButton(arr){
+			$('.buttonimg[enable=false]').css({
+					left:'-50%',
+			});
+			$('.buttonimg[enable=true]').css({
+					left:'0px',
+			});
+			$('.buttonimg').click(function(event){
+				var enableClass = $(event.target).attr('class');
+				if(enableClass!='buttonimg'){
+					var $enableValue=$(event.target).parent();
+					var enableValue =  $enableValue.attr('enable');
+					if(enableValue=='true'){
+						$enableValue.attr('enable','false');
+						$enableValue.animate({
+							left:'-50%',
+						},500);
+					}else if(enableValue=='false'){
+						$enableValue.attr('enable','true');
+						$enableValue.animate({
+							left:'0px',
+						},500);
+					}
+				}else{
+					var enableValue = $(event.target).attr('enable');
+					if(enableValue=='true'){
+						$(event.target).attr('enable','false');
+						$(event.target).animate({
+							left:'-50%',
+						},500);
+					}else if(enableValue=='false'){
+						$(event.target).attr('enable','true');
+						$(event.target).animate({
+							left:'0px',
+						},500);
+					}
+				}
+			});
+
+		}
+			
+
+		//模态框
+		$('#exampleModal').on('show.bs.modal', function (event) {
+		  	var button = $(event.relatedTarget);
+		  	var recipient = button.data('whatever');
+		  	var modal = $(this);
+		 	modal.find('.modal-title').text(recipient);
+		  	if(recipient=='修改'){
+		  		var $xinXi = button.parent();
+		  		$xinXi = $xinXi.siblings(':eq(1)');
+		  		$('#recipient-name1').val($xinXi.text());
+		  		$xinXi = $xinXi.siblings(':eq(2)');
+		  		$('#recipient-name2').val($xinXi.siblings(':eq(2)').text());
+		  		//console.log($xinXi);
+		  		$('#message-text').val($xinXi.text());
+
+		  		var dataId = button.attr('value');
+		  		$('#add').attr('data-id',dataId);
+		  		console.log($('#add').attr('data-id'));
+		  	}else{
+		  		$('#recipient-name1').val('');
+		  		$('#recipient-name2').val('');
+		  		$('#message-text').val('');
+		  	}
+		});
+
+		//添加或修改数据
+		$('#add').click(function(){
+			var obj = {
+				username:'',
+				password:'',
+				nickname:'',
+				email:''
+			};
+			obj.username = $('#recipient-name1').val()+'';
+			obj.password = $('#recipient-name2').val()+'';
+			var password2 = $('#recipient-name3').val()+'';
+			obj.nickname = $('#recipient-name4').val()+'';
+			obj.email = $('#recipient-name5').val();
+			if (obj.password==password2) {
+				getAjax('/manager/user/saveOrUpdateUser','post',obj,function(res){
+					getAllCategory();
+					alert('保存成功');
+				},function(error){
+					alert('保存失败');
+				});
+			}else{
+				alert('请输入相同密码');
+			}
+		});
+
+
+		//得到数据方法
+		function getAllCategory(){
+			getAjax('/manager/user/findAllUser','get',null,function(res){
+				var no = 0;
+				console.log(res.data);
+				$('.usergroup').html('');
+				res.data.forEach(function(item){
+					no += 1;
+					var $newDiv = $(`<div class="col-sm-4" divNo="`+no+`">
+					<div class="usercontent">
+						<img src="">
+						<div class="caption">
+							<div class="row">
+								<div class="col-sm-4 col-sm-offset-1">用户名</div>
+								<div class="col-sm-7">`+item.username+`</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-4 col-sm-offset-1">真实姓名</div>
+								<div class="col-sm-7">`+item.nickname+`</div>
+							</div>
+							<div class="row time">
+								<div class="col-sm-4 col-sm-offset-1">注册时间</div>
+								<div class="col-sm-7">`+item.regTime+`</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-4 col-sm-offset-1">Email</div>
+								<div class="col-sm-7">`+item.email+`</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-4 col-sm-offset-1">状态</div>
+								<div class="col-sm-7">
+									<div class="switchbutton">
+										<div class="buttonimg" enable="`+item.enabled+`">
+											<div class="kai col-sm-4">NO</div>
+											<div class="zhongjian col-sm-4"></div>
+											<div class="guan col-sm-4">off</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>`);
+					$('.usergroup').append($newDiv);
+				});
+				switchButton(res.data);
+				fenYe();
+			},function(error){
+				console.log(error);
+			});
+		}
+
+
+		//设置分页
+		function fenYe(){
+			$('.yema').remove();
+			var $nextTr = $('.col-sm-4[divNo=3]').nextAll();
+			$nextTr.css({
+				display:'none',
+			});
+			var no = $('.col-sm-4[divNo]:last').attr('divNo');
+			var yeNo = parseInt(no/3+1);
+			for(var i=1;i<=(yeNo);i++){
+				var $newLi = $(`<li class="yema"><a href="#">`+i+`</a></li>`);
+				$('#yewei').before($newLi);
+			}
+			console.log($('.yema:eq(0)'));
+			//'background','#337ab7'
+			$($('.yema:eq(0)').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var yemaLeft = ($('.fenye').width()-$('.pagination').width())/2;
+			console.log(yemaLeft);
+			$('.pagination').css('left',yemaLeft+'px');
+		}
+		
+		var yemaNum = 1;
+		$('.pagination').click(function(event){
+			$($('.yema').children()).css({
+				background:'',
+				color:'',
+			});
+			var $yema = $(event.target);
+			var weiNum = $('#yewei').prev().text();
+			if(($yema.attr('aria-label')=='Previous'||$yema.attr('aria-hidden'))&&yemaNum!=1){
+				var yemaText = yemaNum-1;
+				yemaNum = yemaText;
+			}
+			if(($yema.attr('aria-label')=='Next'||$yema.attr('aria-hidden'))&&yemaNum!=weiNum){
+				var yemaText = +(yemaNum)+1;
+				yemaNum = yemaText;
+			}
+			if ($yema.attr('aria-label')==undefined&&!($yema.attr('aria-hidden'))){
+				var yemaText = $yema.text();
+				yemaNum = yemaText; 
+			}
+			$($('.yema:eq('+(yemaNum-1)+')').children()).css({
+				background:'#337ab7',
+				color:'white',
+			});
+			var nextNo = yemaText*3;
+			if(yemaText){
+				$('.col-sm-4[divNo]').css({
+					display:'',
+				});
+				$nextTr = $('.col-sm-4[divNo='+nextNo+']').nextAll();
+				$nextTr.css({
+					display:'none',
+				});
+				var prevNo = nextNo-2;
+				var $prevTr = $('.col-sm-4[divNo='+prevNo+']').prevAll();
+				$prevTr.css({
+					display:'none',
+				});
+			}
+		});
+	</script>
+</div>

@@ -1,0 +1,288 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+/* header{
+	display: block;
+}  */
+html,body{
+	height: 100%;
+}
+body{
+	display: flex;
+	background: #F0F0F0;
+}
+/*左侧*/
+.info-left{
+	width: 200px;
+}
+/*右侧*/
+.info-right{
+	flex: 1;
+}
+/*头部*/
+.info-left>header,.info-right>header{
+	height: 60px;
+}
+.info-right>header{
+	background-color: white;
+}
+.info-right .listicon{
+	float: left;
+	font-size: 24px;
+	margin: 13px 25px;
+	position: relative;
+}
+.info-right .fa-envelope{
+	position: absolute;
+	top: 4px;
+}
+.info-right .xinxishu{
+	background-color: red;
+	color: white;
+	position: absolute;
+	border-radius: 50%;
+	width: 18px;
+	height: 18px;
+	font-size: 12px;
+	line-height: 16px;
+	text-align: center;
+	font-weight: 700;
+	left: 14px;
+}
+.info-right .youjiantou{
+	float: right;
+	margin: 13px 25px;
+	margin-left: 10px;
+	font-size: 24px;
+}
+.info-right .name{
+	font-size: 20px;
+	float: right;
+	margin: 16px 25px;
+	margin-right: 0px;
+	font-weight: 200;
+}
+.info-right  .info-content{
+	height: calc(100%-60px);
+	overflow: auto;
+	padding: 10px;
+}
+.info-content{
+	width: 100%;
+}
+/*左侧头部*/
+.info-left>header{
+	background-color: #3d556d;
+	line-height: 60px;
+	font-size: 20px;
+	color: white;
+}
+.info-left>header img{
+	float: left;
+	width: 40px;
+	height: 40px;
+	margin: 10px 10px 10px 20px;
+}
+/*nav*/
+.info-left nav{
+	height: calc(100% - 60px);
+	border-right: 1px solid #ccc;
+	background-color: #282830;
+	color: white;
+}
+.info-left li{
+	line-height: 30px;
+	padding: 5px 10px;
+	border-bottom: 1px solid #ccc;
+	cursor: pointer;
+}
+.info-left li:hover{
+	color: #3d556d;
+	background-color: #ccc;
+}
+.info-left li i:first-child{
+	margin-right: 10px;
+}
+.info-left li i:last-child{
+	float: right;
+	line-height: 30px;
+}
+/*表格div*/
+.btns-div{
+	background: white;
+	padding: 10px;
+}
+.table-div{
+	margin-top: 10px;
+}
+/*表格内的图标颜色*/
+.table-div td i{
+	cursor: pointer;
+	margin-right: 10px;
+}
+.table-div td i:last-child{
+	margin-right: 0px;
+}
+.table-div td i[title=编辑]{
+	color: #5cb85c;
+}
+.table-div td i[title=删除]{
+	color: #c9302c;
+}
+/*分页样式*/
+.fenye{
+	height: 480px;
+	overflow: hidden;
+	position: relative;
+	background: white;
+	padding: 10px;
+	padding-top: 0px;
+}
+.table-div{
+	width: calc(100% - 50px);
+	position: absolute;
+	padding-bottom: 0px;
+}
+.table-div tbody tr{
+	position: relative;
+}
+.pagination{
+	position: absolute;
+	left: 439px;
+	bottom: -20px;
+}
+.btns-div select{
+	display: inline-block;
+	width: 250px
+}
+
+/*资讯中的图片*/
+.control-label{
+	display: block;
+}
+#style-one,#style-two{
+	display: inline-block;
+	width: 13px;
+	height: 13px;
+}
+#style-one+img{
+	width: 240px;
+	height: 100px;
+}
+#style-two+img{
+	width: 240px;
+	height: 100px;
+}
+
+/*用户样式*/
+#userbtns-div{
+	background: #F0F0F0;
+}
+.userfenye{
+	background: #F0F0F0;
+}
+.usergroup{
+	margin-top: 10px;
+}
+.usercontent{
+	box-shadow: 3px 3px 3px #ccc;
+	font-size: 20px;
+	font-weight: 100;
+	line-height: 40px;
+	padding: 4px;
+	margin-bottom: 20px;
+	border: 1px solid #ddd;
+	background: white;
+}
+.usercontent img{
+	display: block;
+	width: 150px;
+	height: 150px;
+	margin: 0px auto;
+	border-radius: 50%;
+}
+.usercontent .caption{
+	padding: 9px;
+}
+.time{
+	height: 80px;
+}
+/*开关样式*/
+.switchbutton{
+	width: 100%;
+	height: 40px;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+.buttonimg{
+	width: 150%;
+	height: 100%;
+	position: absolute;
+	border-radius: 5px;
+	cursor: pointer;
+	/*left: -50%;*/
+}
+.buttonimg div{
+	text-align: center;
+}
+.kai{
+	background: #337ab7;
+	font-size: 16px;
+	color: white;
+}
+.guan{
+	background: #ccc;
+	font-size: 16px;
+}
+
+/*首页样式*/
+.hang{
+	background: white;
+	margin-top: 10px;
+	padding: 10px;
+	border-radius: 5px;
+	overflow: hidden;
+}
+.tubiao{
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	font-size: 24px;
+	background-color: #63b919;
+	color: white;
+	text-align: center;
+	line-height: 40px;
+	margin-left: 10px;
+	float: left;
+}
+.shuzi{
+	float: left;
+	margin-left: 14px;
+	width: 90px;
+	position: relative;
+	padding: 0px;
+}
+.shuzi span{
+	font-size: 24px;
+}
+.shuzi small{
+	position: absolute;
+	font-size: 10px;
+	left: 0px;
+	top: 28px;
+}
+#container1{
+	margin-top: 10px;
+	height: 206px;
+}
+#container2{
+	margin-top: 10px;
+	height: 98px;
+}
+#container3{
+	margin-top: 10px;
+	height: 98px;
+}
